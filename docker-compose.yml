@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: local-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=local_dev
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - local-dev-network
+  redis:
+    image: redis:7-alpine
+    container_name: local-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - ./config/redis/redis.conf:/etc/redis/redis.conf
+      - ./data/redis:/data
+    networks:
+      - local-dev-network
+
+networks:
+  local-dev-network:
+    driver: bridge
