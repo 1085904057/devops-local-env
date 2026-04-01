@@ -28,6 +28,40 @@ services:
       - ./data/redis:/data
     networks:
       - local-dev-network
+  postgres:
+    image: postgres:latest
+    container_name: local-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=local_dev
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./data/postgres:/var/lib/postgresql
+    command: -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - local-dev-network
+  svix:
+    image: svix/svix-server:latest
+    container_name: local-svix
+    restart: always
+    ports:
+      - "8071:8071"
+    environment:
+      - SVIX_JWT_SECRET=your-secret-key-change-in-production
+      - SVIX_DB_DSN=postgresql://postgres:123456@postgres:5432/local_dev
+      - SVIX_QUEUE_TYPE=memory
+      - SVIX_REDIS_DSN=redis://redis:6379
+      - RUST_LOG=info
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - local-dev-network
 
 networks:
   local-dev-network:

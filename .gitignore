@@ -1,2 +1,5 @@
 /.idea/
 /data/
+/application/application.iml
+/out/
+/web-demo/target/
